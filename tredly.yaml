@@ -1,0 +1,74 @@
+---
+  container:
+    compatibleWith: "1.0.0"
+    customDNS: []
+    startOrder: 1
+    resourceLimits:
+      maxRam: "unlimited"
+      maxCpu: "unlimited"
+      maxHdd: "unlimited"
+    technicalOptions: {}
+    replicate: false
+    firewall:
+      ipv4Whitelist: []
+      allowPorts:
+        udp:
+          out:
+            - 53
+          in: []
+        tcp:
+          out:
+            - 80
+            - 443
+          in:
+            - 22
+    proxy:
+      layer7Proxy: []
+      layer4Proxy: false
+    operations:
+      onCreate:
+        -
+          type: "installPackage"
+          value: "rsync"
+        -
+          source: "sshd_config"
+          type: "fileFolderMapping"
+          target: "/etc/ssh/"
+        -
+          type: "exec"
+          value: "mkdir /var/empty"
+        -
+          type: "exec"
+          value: "sysrc sshd_enable=yes"
+        -
+          type: "exec"
+          value: "pw useradd -n tredly -s /bin/tcsh -m"
+        -
+          type: "exec"
+          value: "pw group mod wheel -m tredly"
+        -
+          type: "exec"
+          value: "mkdir -p /usr/home/tredly/.ssh"
+        -
+          type: "exec"
+          value: "ssh-keygen -t rsa -b 4096 -N '' -f /usr/home/tredly/.ssh/id_rsa -q"
+        -
+          type: "exec"
+          value: "chmod 700 /usr/home/tredly/.ssh"
+        -
+          source: "authorized_keys"
+          type: "fileFolderMapping"
+          target: "/usr/home/tredly/.ssh/"
+        -
+          type: "exec"
+          value: "chmod 600 /usr/home/tredly/.ssh/authorized_keys"
+        -
+          type: "exec"
+          value: "chown -R bamboo /usr/home/tredly"
+        -
+          type: "exec"
+          value: "service sshd start"
+      onStop: []
+    name: "sshonly"
+    buildOptions:
+      publish: false
