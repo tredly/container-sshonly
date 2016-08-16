@@ -1,6 +1,6 @@
 ---
   container:
-    compatibleWith: "1.0.0"
+    compatibleWith: "1.1.0"
     customDNS: []
     startOrder: 1
     resourceLimits:
